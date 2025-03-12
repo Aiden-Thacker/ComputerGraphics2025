@@ -20,6 +20,8 @@
 // git fetch
 // git pull
 
+// From Kaden: Hi!
+
 // move out to external class
 unsigned int vertexShader;
 unsigned int VBO, VAO, EBO;
