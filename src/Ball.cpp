@@ -4,14 +4,18 @@
 
 using namespace glm;
 
+int leftScore = 0;
+int rightScore = 0;
+
 void Ball::Start() {
+
+
     name = "Ball";
     position = vec3(window->GetScreenWidth() * 0.5f, window->GetScreenHeight() * 0.5f, 0.0f);
     scale = vec3(100.0f, 100.0f, 0.0f);
 }
 
 void Ball::Update(float _dt) {
-    window->SetWindowName("Pong");
 
     if (dir == vec2(0.0f))
     {
@@ -34,12 +38,24 @@ void Ball::Update(float _dt) {
     // detect score
     if (position.x > window->GetScreenWidth() - (scale.x * 0.5f)) {
         position = vec3(window->GetScreenWidth()*0.5f, window->GetScreenHeight()*0.5f, 0.0f);
+        leftScore++;
         dir = vec2(0.0f);
     }
     if (position.x < scale.x * 0.5f) {
         position = vec3(window->GetScreenWidth()*0.5f, window->GetScreenHeight()*0.5f, 0.0f);
+        rightScore++;
         dir = vec2(0.0f);
     }
+
+    window->SetWindowName("Pong -- Left Score: " + std::to_string(leftScore) + " -- Right Score: " + std::to_string(rightScore));
+
+    if (leftScore >= 5 || rightScore >= 5) {
+        SDL_Event quitEvent;  //temporary
+        quitEvent.type = SDL_QUIT;
+        SDL_PushEvent(&quitEvent);  
+        //end game winner function here Endgame();
+    }
+
 
     // detect if ball hits left paddle
     Paddle* leftPaddle = world->FindByName<Paddle>("LeftPaddle"); 
@@ -55,6 +71,9 @@ void Ball::Update(float _dt) {
 
     if (dir != vec2(0.0f))
         position += vec3(dir.x, dir.y, 0.0f) * speed * _dt;
+
+
+  
 }
 
 void Ball::Draw() {mat4 transform = mat4(1.0f);
