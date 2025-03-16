@@ -22,7 +22,8 @@ void Paddle::Update(float _dt) {
         dir.y += inputManager->GetKey(SDL_SCANCODE_DOWN) * -1;
     }
 
-    position.y += dir.y * speed * _dt;
+    float speedMultiplier = 3.5f; //can change padddle speed 
+    position.y += dir.y * speed * speedMultiplier * _dt;
 
     if (position.y > window->GetScreenHeight() - (scale.y * 0.5f))
         position.y = window->GetScreenHeight() - (scale.y * 0.5f);
