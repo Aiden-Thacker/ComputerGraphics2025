@@ -120,11 +120,6 @@ void Ball::Draw() {mat4 transform = mat4(1.0f);
         alpha *= 0.7f;
         scaleFactor *= 0.8f;
     }
-
-    // Draw main ball
-    glBindVertexArray(world->VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
 }
 
 void Ball::OnDestroy() {
