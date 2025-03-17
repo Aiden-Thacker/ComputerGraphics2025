@@ -7,6 +7,8 @@ using namespace glm;
 int leftScore = 0;
 int rightScore = 0;
 const float posSaveDistance = 60.0f;
+static const float bounceScaleFactor = 2.2f; // Increase size
+static const float bounceDuration = 0.2f; 
 
 void Ball::Start() {
 
@@ -77,12 +79,29 @@ void Ball::Update(float _dt) {
     Paddle* leftPaddle = world->FindByName<Paddle>("LeftPaddle"); 
     if (EntityOverlap2D(*this ,*leftPaddle)) {
         dir.x = abs(dir.x);
+
+        scaleModifier = bounceScaleFactor;
+        bounceTimer = bounceDuration;
+        leftPaddle->scaleModifier = bounceScaleFactor;
+        leftPaddle->bounceTimer = bounceDuration;
     }
 
     // detect if ball hits right paddle
     Paddle* rightPaddle = world->FindByName<Paddle>("RightPaddle"); 
     if (EntityOverlap2D(*this ,*rightPaddle)) {
         dir.x = abs(dir.x) * -1.0f;
+
+        scaleModifier = bounceScaleFactor;
+        bounceTimer = bounceDuration;
+        rightPaddle->scaleModifier = bounceScaleFactor;
+        rightPaddle->bounceTimer = bounceDuration;
+    }
+
+    if (bounceTimer > 0.0f) {
+        bounceTimer -= _dt; 
+        if (bounceTimer <= 0.0f) {
+            scaleModifier = 1.0f; //reset size
+        }
     }
 
     float speedMultiplier = 1.35f; //change ball speed
@@ -93,8 +112,8 @@ void Ball::Update(float _dt) {
 }
 
 void Ball::Draw() {mat4 transform = mat4(1.0f);
-    transform = translate(transform, position);
-    transform = glm::scale(transform, scale);
+    transform = translate(transform, position - (scale * (scaleModifier - 1.0f) * 0.5f));
+    transform = glm::scale(transform, scale * scaleModifier);
 
     // set shader variables
     shader.SetVec4("COLOR", color);

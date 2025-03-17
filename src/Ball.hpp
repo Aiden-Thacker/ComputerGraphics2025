@@ -15,4 +15,6 @@ public:
     float speed = 100.0f;
     glm::vec2 dir = glm::vec2(0.0f, 0.0f);
     std::deque<glm::vec3> previousPositions;
+    float scaleModifier = 1.0f;
+    float bounceTimer = 0.0f;   
 };
