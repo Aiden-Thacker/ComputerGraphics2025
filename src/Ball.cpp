@@ -81,12 +81,11 @@ void Ball::Update(float _dt) {
         dir.x = abs(dir.x) * -1.0f;
     }
 
-    float speedMultiplier = 1.3f; //change ball speed
+    float speedMultiplier = 1.35f; //change ball speed
     if (dir != vec2(0.0f))
-    position += vec3(dir.x, dir.y, 0.0f) * speed * speedMultiplier * _dt;
-
-
-  
+    {
+        position += vec3(dir.x, dir.y, 0.0f) * speed * speedMultiplier * _dt;
+    }
 }
 
 void Ball::Draw() {mat4 transform = mat4(1.0f);
