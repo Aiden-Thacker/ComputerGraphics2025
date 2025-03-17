@@ -2,6 +2,12 @@
 
 #include "Paddle.hpp"
 
+#include "World.hpp"
+
+#include "Canis/IOManager.hpp"
+#include <SDL.h>
+#include <GL/glew.h>
+
 using namespace glm;
 
 int leftScore = 0;
@@ -13,6 +19,28 @@ void Ball::Start() {
     name = "Ball";
     position = vec3(window->GetScreenWidth() * 0.5f, window->GetScreenHeight() * 0.5f, 0.0f);
     scale = vec3(100.0f, 100.0f, 0.0f);
+
+    spriteShader.Compile("assets/shaders/sprite.vs", "assets/shaders/sprite.fs");
+    spriteShader.AddAttribute("aPos");
+    spriteShader.AddAttribute("aUV");
+    spriteShader.Link();
+
+    Canis::GLTexture leftPaddleTexture = Canis::LoadImageGL("assets/textures/Blue_Wool_Texture.png", true);
+    Canis::GLTexture rightPaddleTexture = Canis::LoadImageGL("assets/textures/Red_Wool_Texture.png", true);
+
+    if (leftPaddleTexture.id == 0) {
+        Canis::Log("Failed to load Left Paddle texture.");
+    }
+    if (rightPaddleTexture.id == 0) {
+        Canis::Log("Failed to load Right Paddle texture.");
+    }
+
+    texture = rightPaddleTexture;
+
+    int textureSlots = 0;
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &textureSlots);
+    Canis::Log(std::to_string(textureSlots));
+    spriteShader.SetInt("texture1", 0);
 }
 
 void Ball::Update(float _dt) {
@@ -61,12 +89,14 @@ void Ball::Update(float _dt) {
     Paddle* leftPaddle = world->FindByName<Paddle>("LeftPaddle"); 
     if (EntityOverlap2D(*this ,*leftPaddle)) {
         dir.x = abs(dir.x);
+        texture = leftPaddleTexture;
     }
 
     // detect if ball hits right paddle
     Paddle* rightPaddle = world->FindByName<Paddle>("RightPaddle"); 
     if (EntityOverlap2D(*this ,*rightPaddle)) {
         dir.x = abs(dir.x) * -1.0f;
+        texture = rightPaddleTexture;
     }
 
     float speedMultiplier = 1.3f; //change ball speed
@@ -84,6 +114,9 @@ void Ball::Draw() {mat4 transform = mat4(1.0f);
     // set shader variables
     shader.SetVec4("COLOR", color);
     shader.SetMat4("TRANSFORM", transform);
+
+    shader.SetInt("texture1", 0);  // Set the uniform for the texture
+    glBindTexture(GL_TEXTURE_2D, texture.id);  // Bind the texture
 }
 
 void Ball::OnDestroy() {
