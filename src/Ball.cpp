@@ -30,19 +30,23 @@ void Ball::Update(float _dt) {
     
     if (position.y > window->GetScreenHeight() - (scale.y * 0.5f)) {
         position.y = window->GetScreenHeight() - (scale.y * 0.5f);
-        dir.y = abs(dir.y) * -1.0f;
+        dir.y = -dir.y; 
     }
+    
     if (position.y < scale.y * 0.5f) {
         position.y = scale.y * 0.5f;
-        dir.y = abs(dir.y);
+        dir.y = abs(dir.y); 
     }
 
-    // Store position only if the ball moved far enough
-    if (previousPositions.empty() || distance(previousPositions.front(), position) > posSaveDistance) {
+    // Store position at fixed time intervals for smoother trails
+    static float trailTimer = 0.0f;
+    trailTimer += _dt;
+    if (trailTimer > 0.05f) {
         previousPositions.push_front(position);
         if (previousPositions.size() > 5) {
             previousPositions.pop_back();
         }
+        trailTimer = 0.0f;
     }
 
     // detect score
