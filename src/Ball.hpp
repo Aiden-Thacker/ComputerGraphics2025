@@ -3,6 +3,7 @@
 #include "Entity.hpp"
 
 #include "World.hpp"
+#include <deque>
 
 #include <SDL.h>
 #include <GL/glew.h>
@@ -16,6 +17,7 @@ public:
 
     float speed = 100.0f;
     glm::vec2 dir = glm::vec2(0.0f, 0.0f);
+    std::deque<glm::vec3> previousPositions;
 
 private:
     Canis::GLTexture leftPaddleTexture;

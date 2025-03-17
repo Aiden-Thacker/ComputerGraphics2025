@@ -12,6 +12,7 @@ using namespace glm;
 
 int leftScore = 0;
 int rightScore = 0;
+const float posSaveDistance = 60.0f;
 
 void Ball::Start() {
 
@@ -19,6 +20,7 @@ void Ball::Start() {
     name = "Ball";
     position = vec3(window->GetScreenWidth() * 0.5f, window->GetScreenHeight() * 0.5f, 0.0f);
     scale = vec3(100.0f, 100.0f, 0.0f);
+    previousPositions.clear();
 
     spriteShader.Compile("assets/shaders/sprite.vs", "assets/shaders/sprite.fs");
     spriteShader.AddAttribute("aPos");
@@ -63,16 +65,26 @@ void Ball::Update(float _dt) {
         dir.y = abs(dir.y);
     }
 
+    // Store position only if the ball moved far enough
+    if (previousPositions.empty() || distance(previousPositions.front(), position) > posSaveDistance) {
+        previousPositions.push_front(position);
+        if (previousPositions.size() > 5) {
+            previousPositions.pop_back();
+        }
+    }
+
     // detect score
     if (position.x > window->GetScreenWidth() - (scale.x * 0.5f)) {
         position = vec3(window->GetScreenWidth()*0.5f, window->GetScreenHeight()*0.5f, 0.0f);
         leftScore++;
         dir = vec2(0.0f);
+        previousPositions.clear();
     }
     if (position.x < scale.x * 0.5f) {
         position = vec3(window->GetScreenWidth()*0.5f, window->GetScreenHeight()*0.5f, 0.0f);
         rightScore++;
         dir = vec2(0.0f);
+        previousPositions.clear();
     }
 
     window->SetWindowName("Pong -- Left Score: " + std::to_string(leftScore) + " -- Right Score: " + std::to_string(rightScore));
@@ -117,6 +129,28 @@ void Ball::Draw() {mat4 transform = mat4(1.0f);
 
     shader.SetInt("texture1", 0);  // Set the uniform for the texture
     glBindTexture(GL_TEXTURE_2D, texture.id);  // Bind the texture
+    float alpha = 0.5f;
+    float scaleFactor = 0.8f;
+
+    shader.Use();
+
+    for (size_t i = 0; i < previousPositions.size(); i++) {
+        mat4 ghostTransform = mat4(1.0f);
+        ghostTransform = translate(ghostTransform, previousPositions[i]);
+        ghostTransform = glm::scale(ghostTransform, scale * scaleFactor);
+
+        shader.SetVec4("COLOR", vec4(color.r, color.g, color.b, alpha));
+        shader.SetMat4("TRANSFORM", ghostTransform);
+
+        glBindVertexArray(world->VAO);
+    }
+        scaleFactor *= 0.8f;
+        alpha *= 0.7f;
+
+        glBindVertexArray(0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    // Render ghost images
+
 }
 
 void Ball::OnDestroy() {
