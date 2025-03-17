@@ -37,7 +37,7 @@ void Ball::Start() {
         Canis::Log("Failed to load Right Paddle texture.");
     }
 
-    texture = rightPaddleTexture;
+    texture = leftPaddleTexture;
 
     int textureSlots = 0;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &textureSlots);

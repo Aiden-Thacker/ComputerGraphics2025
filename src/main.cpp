@@ -113,13 +113,13 @@ int main(int argc, char *argv[])
         view = inverse(view);
 
         // Draw the grid background
-        mat4 gridTransform = mat4(1.0f);
-        gridTransform = translate(gridTransform, vec3(0.0f, 0.0f, 0.0f));  // Position at (0, 0)
-        gridTransform = glm::scale(gridTransform, vec3(window.GetScreenWidth(), window.GetScreenHeight(), 1.0f));  // Scale to cover the screen
+        //mat4 gridTransform = mat4(1.0f);
+        //gridTransform = translate(gridTransform, vec3(0.0f, 0.0f, 0.0f));  // Position at (0, 0)
+        //gridTransform = glm::scale(gridTransform, vec3(window.GetScreenWidth(), window.GetScreenHeight(), 1.0f));  // Scale to cover the screen
 
-        spriteShader.SetMat4("TRANSFORM", gridTransform);
+        //spriteShader.SetMat4("TRANSFORM", gridTransform);
         //glBindTexture(GL_TEXTURE_2D, gridTexture.id);
-        glDrawArrays(GL_TRIANGLES, 0, 6);  // Draw the grid texture
+        //glDrawArrays(GL_TRIANGLES, 0, 6);  // Draw the grid texture
 
         world.Update(view, projection, deltaTime);
 
