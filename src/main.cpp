@@ -67,6 +67,9 @@ int main(int argc, char *argv[])
     glActiveTexture(GL_TEXTURE0 + 0);
     glBindTexture(GL_TEXTURE_2D, texture.id);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     World world;
     world.VAO = VAO;
     world.window = &window;
@@ -112,6 +115,8 @@ int main(int argc, char *argv[])
         window.SwapBuffer();
 
         fps = frameRateManager.EndFrame();
+
+        Canis::Log(std::to_string(fps));
     }
 
     return 0;
