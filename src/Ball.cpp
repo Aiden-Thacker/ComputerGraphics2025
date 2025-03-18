@@ -29,17 +29,7 @@ void Ball::Start() {
     spriteShader.AddAttribute("aUV");
     spriteShader.Link();
 
-    Canis::GLTexture leftPaddleTexture = Canis::LoadImageGL("assets/textures/Blue_Wool_Texture.png", true);
-    Canis::GLTexture rightPaddleTexture = Canis::LoadImageGL("assets/textures/Red_Wool_Texture.png", true);
-
-    if (leftPaddleTexture.id == 0) {
-        Canis::Log("Failed to load Left Paddle texture.");
-    }
-    if (rightPaddleTexture.id == 0) {
-        Canis::Log("Failed to load Right Paddle texture.");
-    }
-
-    texture = leftPaddleTexture;
+    texture = texture;
 
     int textureSlots = 0;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &textureSlots);
@@ -107,7 +97,7 @@ void Ball::Update(float _dt) {
     Paddle* leftPaddle = world->FindByName<Paddle>("LeftPaddle"); 
     if (EntityOverlap2D(*this ,*leftPaddle)) {
         dir.x = abs(dir.x);
-        texture = leftPaddleTexture;
+        texture = leftPaddle->texture;
 
         scaleModifier = bounceScaleFactor;
         bounceTimer = bounceDuration;
@@ -119,7 +109,7 @@ void Ball::Update(float _dt) {
     Paddle* rightPaddle = world->FindByName<Paddle>("RightPaddle"); 
     if (EntityOverlap2D(*this ,*rightPaddle)) {
         dir.x = abs(dir.x) * -1.0f;
-        texture = rightPaddleTexture;
+        texture = rightPaddle->texture;
 
         scaleModifier = bounceScaleFactor;
         rightPaddle->scaleModifier = bounceScaleFactor;
