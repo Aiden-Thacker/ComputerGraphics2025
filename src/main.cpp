@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     Canis::GLTexture texture = Canis::LoadImageGL("assets/textures/White_Wool_Block.png", true);
     Canis::GLTexture texture2 = Canis::LoadImageGL("assets/textures/Blue_Wool_Texture.png", true);
     Canis::GLTexture texture3 = Canis::LoadImageGL("assets/textures/Red_Wool_Texture.png", true);
-    //Canis::GLTexture gridTexture = Canis::LoadImageGL("assets/textures/grid.png", true);
+    Canis::GLTexture gridTexture = Canis::LoadImageGL("assets/textures/grid.png", true);
     
     int textureSlots = 0;
 
@@ -112,14 +112,12 @@ int main(int argc, char *argv[])
         view = translate(view, vec3(0.0f, 0.0f, 0.5f));
         view = inverse(view);
 
-        // Draw the grid background
-        //mat4 gridTransform = mat4(1.0f);
-        //gridTransform = translate(gridTransform, vec3(0.0f, 0.0f, 0.0f));  // Position at (0, 0)
-        //gridTransform = glm::scale(gridTransform, vec3(window.GetScreenWidth(), window.GetScreenHeight(), 1.0f));  // Scale to cover the screen
-
-        //spriteShader.SetMat4("TRANSFORM", gridTransform);
-        //glBindTexture(GL_TEXTURE_2D, gridTexture.id);
-        //glDrawArrays(GL_TRIANGLES, 0, 6);  // Draw the grid texture
+        // Draw grid
+        spriteShader.Use();
+        spriteShader.SetMat4("TRANSFORM", mat4(1.0f));
+        glBindTexture(GL_TEXTURE_2D, gridTexture.id);
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         world.Update(view, projection, deltaTime);
 
