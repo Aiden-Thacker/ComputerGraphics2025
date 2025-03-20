@@ -124,7 +124,7 @@ void Ball::Update(float _dt) {
         }
     }
 
-    float speedMultiplier = 1.35f; //change ball speed
+    float speedMultiplier = 2.5f; //change ball speed
     if (dir != vec2(0.0f))
     {
         position += vec3(dir.x, dir.y, 0.0f) * speed * speedMultiplier * _dt;

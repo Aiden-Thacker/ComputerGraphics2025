@@ -52,7 +52,7 @@ void Paddle::Update(float _dt) {
         }
     }
 
-    float speedMultiplier = 3.5f; //can change padddle speed 
+    float speedMultiplier = 1.5f; //can change padddle speed 
     position.y += dir.y * speed * speedMultiplier * _dt;
 
     if (position.y > window->GetScreenHeight() - (scale.y * 0.5f))
