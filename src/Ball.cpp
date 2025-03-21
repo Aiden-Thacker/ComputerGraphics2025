@@ -38,15 +38,25 @@ void Ball::Update(float _dt) {
         dir.y = abs(dir.y); 
     }
 
-    // Store position at fixed time intervals for smoother trails
     static float trailTimer = 0.0f;
-    trailTimer += _dt;
-    if (trailTimer > 0.05f) {
-        previousPositions.push_front(position);
-        if (previousPositions.size() > 5) {
-            previousPositions.pop_back();
+    if (dir != vec2(0.0f))
+    {
+        trailTimer += _dt;
+        if (trailTimer > 0.05f) {
+            // Interpolate new position for a smooth trailing effect
+            if (!previousPositions.empty()) {
+                vec3 interpolatedPos = mix(previousPositions.front(), position, 0.1f);
+                previousPositions.push_front(interpolatedPos);
+            } else {
+                previousPositions.push_front(position);
+            }
+
+            if (previousPositions.size() > 5) {
+                previousPositions.pop_back();
+            }
+
+            trailTimer = 0.0f;
         }
-        trailTimer = 0.0f;
     }
 
     // detect score
@@ -102,15 +112,18 @@ void Ball::Draw() {mat4 transform = mat4(1.0f);
 
     glBindTexture(GL_TEXTURE_2D, texture.id);
 
-    // Render ghost images
+    // Render ghost images with smoother trailing effect
     float alpha = 0.5f;
     float scaleFactor = 0.8f;
 
     shader.Use();
 
     for (size_t i = 0; i < previousPositions.size(); i++) {
+        float offsetFactor = 1.0f - (i * 0.2f); // Decrease offset over time for gradual trailing effect
+        vec3 offsetPos = mix(previousPositions[i], position, offsetFactor); // Blend positions for a smoother effect
+
         mat4 ghostTransform = mat4(1.0f);
-        ghostTransform = translate(ghostTransform, previousPositions[i]);
+        ghostTransform = translate(ghostTransform, offsetPos);
         ghostTransform = glm::scale(ghostTransform, scale * scaleFactor);
 
         shader.SetVec4("COLOR", vec4(color.r, color.g, color.b, alpha));
