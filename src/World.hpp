@@ -36,6 +36,9 @@ public:
             e->shader.SetMat4("PROJECTION", _projection);
             e->shader.SetMat4("VIEW", _view);
 
+            glActiveTexture(GL_TEXTURE0 + 0);
+            glBindTexture(GL_TEXTURE_2D, e->texture.id);
+
             e->Draw();
 
             glBindVertexArray(VAO);

@@ -12,4 +12,6 @@ public:
     void OnDestroy();
 
     float speed = 200.0f;
+    float scaleModifier = 1.0f; 
+    float bounceTimer = 0.0f;   
 };

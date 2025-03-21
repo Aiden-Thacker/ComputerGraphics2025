@@ -2,11 +2,19 @@
 
 #include "Paddle.hpp"
 
+#include "World.hpp"
+
+#include "Canis/IOManager.hpp"
+#include <SDL.h>
+#include <GL/glew.h>
+
 using namespace glm;
 
 int leftScore = 0;
 int rightScore = 0;
 const float posSaveDistance = 60.0f;
+static const float bounceScaleFactor = 2.2f; // Increase size
+static const float bounceDuration = 0.2f; 
 
 void Ball::Start() {
 
@@ -15,6 +23,18 @@ void Ball::Start() {
     position = vec3(window->GetScreenWidth() * 0.5f, window->GetScreenHeight() * 0.5f, 0.0f);
     scale = vec3(100.0f, 100.0f, 0.0f);
     previousPositions.clear();
+
+    spriteShader.Compile("assets/shaders/sprite.vs", "assets/shaders/sprite.fs");
+    spriteShader.AddAttribute("aPos");
+    spriteShader.AddAttribute("aUV");
+    spriteShader.Link();
+
+    texture = texture;
+
+    int textureSlots = 0;
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &textureSlots);
+    Canis::Log(std::to_string(textureSlots));
+    spriteShader.SetInt("texture1", 0);
 }
 
 void Ball::Update(float _dt) {
@@ -87,15 +107,34 @@ void Ball::Update(float _dt) {
     Paddle* leftPaddle = world->FindByName<Paddle>("LeftPaddle"); 
     if (EntityOverlap2D(*this ,*leftPaddle)) {
         dir.x = abs(dir.x);
+        texture = leftPaddle->texture;
+
+        scaleModifier = bounceScaleFactor;
+        bounceTimer = bounceDuration;
+        leftPaddle->scaleModifier = bounceScaleFactor;
+        leftPaddle->bounceTimer = bounceDuration;
     }
 
     // detect if ball hits right paddle
     Paddle* rightPaddle = world->FindByName<Paddle>("RightPaddle"); 
     if (EntityOverlap2D(*this ,*rightPaddle)) {
         dir.x = abs(dir.x) * -1.0f;
+        texture = rightPaddle->texture;
+
+        scaleModifier = bounceScaleFactor;
+        rightPaddle->scaleModifier = bounceScaleFactor;
+        bounceTimer = bounceDuration;
+        rightPaddle->bounceTimer = bounceDuration;
     }
 
-    float speedMultiplier = 1.35f; //change ball speed
+    if (bounceTimer > 0.0f) {
+        bounceTimer -= _dt; 
+        if (bounceTimer <= 0.0f) {
+            scaleModifier = 1.0f; //reset size
+        }
+    }
+
+    float speedMultiplier = 2.5f; //change ball speed
     if (dir != vec2(0.0f))
     {
         position += vec3(dir.x, dir.y, 0.0f) * speed * speedMultiplier * _dt;
@@ -103,16 +142,15 @@ void Ball::Update(float _dt) {
 }
 
 void Ball::Draw() {mat4 transform = mat4(1.0f);
-    transform = translate(transform, position);
-    transform = glm::scale(transform, scale);
+    transform = translate(transform, position - (scale * (scaleModifier - 1.0f) * 0.5f));
+    transform = glm::scale(transform, scale * scaleModifier);
 
     // set shader variables
     shader.SetVec4("COLOR", color);
     shader.SetMat4("TRANSFORM", transform);
 
-    glBindTexture(GL_TEXTURE_2D, texture.id);
-
-    // Render ghost images with smoother trailing effect
+    shader.SetInt("texture1", 0);  // Set the uniform for the texture
+    glBindTexture(GL_TEXTURE_2D, texture.id);  // Bind the texture
     float alpha = 0.5f;
     float scaleFactor = 0.8f;
 
@@ -130,12 +168,14 @@ void Ball::Draw() {mat4 transform = mat4(1.0f);
         shader.SetMat4("TRANSFORM", ghostTransform);
 
         glBindVertexArray(world->VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
-
-        alpha *= 0.7f;
-        scaleFactor *= 0.8f;
     }
+        scaleFactor *= 0.8f;
+        alpha *= 0.7f;
+
+        glBindVertexArray(0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    // Render ghost images
+
 }
 
 void Ball::OnDestroy() {
