@@ -13,7 +13,7 @@ using namespace glm;
 int leftScore = 0;
 int rightScore = 0;
 const float posSaveDistance = 60.0f;
-static const float bounceScaleFactor = 2.2f; // Increase size
+static const float bounceScaleFactor = 2.0f; // Increase size
 static const float bounceDuration = 0.2f; 
 
 void Ball::Start() {
@@ -97,6 +97,7 @@ void Ball::Update(float _dt) {
 
     if (leftScore >= 5 || rightScore >= 5) {
         window->SetWindowName("Pong -- Left Score: " + std::to_string(leftScore) + " -- Right Score: " + std::to_string(rightScore) + " GAME OVER!!");
+        
         SDL_Event quitEvent;
         quitEvent.type = SDL_QUIT;
         SDL_PushEvent(&quitEvent);  
