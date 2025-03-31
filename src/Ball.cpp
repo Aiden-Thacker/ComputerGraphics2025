@@ -97,6 +97,7 @@ void Ball::Update(float _dt) {
 
     if (leftScore >= 5 || rightScore >= 5) {
         window->SetWindowName("Pong -- Left Score: " + std::to_string(leftScore) + " -- Right Score: " + std::to_string(rightScore) + " GAME OVER!!");
+        SDL_Event quitEvent;
         quitEvent.type = SDL_QUIT;
         SDL_PushEvent(&quitEvent);  
         //end game winner function here Endgame();
